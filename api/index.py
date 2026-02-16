@@ -4,7 +4,7 @@ import time
 import xml.etree.ElementTree as ET
 
 import requests
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, CORSMiddleware
 
 app = FastAPI()
 app.add_middleware(
