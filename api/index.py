@@ -7,6 +7,12 @@ import requests
 from fastapi import FastAPI, HTTPException, Query
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://roadcast-sable.vercel.app", "http://localhost:3000"],
+    allow_methods=["get"],
+    allow_headers=["*"],
+)
 
 # =====================
 # CACHE
