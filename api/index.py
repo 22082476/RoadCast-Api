@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://roadcast-sable.vercel.app", "http://localhost:3000"],
+    allow_origins=["https://roadcast-sable.vercel.app", "http://localhost:3000", "https://22082476.github.io"],
     allow_methods=["get"],
     allow_headers=["*"],
 )
