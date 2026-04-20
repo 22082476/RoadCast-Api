@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import requests
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 app.add_middleware(
@@ -21,6 +22,148 @@ app.add_middleware(
 data_cache = None
 last_loaded = 0
 CACHE_TTL = 120
+
+
+@app.get("/docs", response_class=HTMLResponse)
+def get_docs():
+    """
+    Serve an HTML documentation page with Vercel Web Analytics integrated.
+    This endpoint provides API documentation and tracks visitor analytics.
+    """
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RoadCast API Documentation</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                line-height: 1.6;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            .container {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            h1 {
+                color: #333;
+                border-bottom: 3px solid #0070f3;
+                padding-bottom: 10px;
+            }
+            h2 {
+                color: #0070f3;
+                margin-top: 30px;
+            }
+            .endpoint {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                margin: 15px 0;
+                border-left: 4px solid #0070f3;
+            }
+            code {
+                background: #e9ecef;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-family: 'Courier New', monospace;
+            }
+            .method {
+                display: inline-block;
+                padding: 4px 8px;
+                background: #28a745;
+                color: white;
+                border-radius: 3px;
+                font-weight: bold;
+                font-size: 0.9em;
+            }
+            .param {
+                margin: 10px 0;
+                padding-left: 20px;
+            }
+            a {
+                color: #0070f3;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🌤️ RoadCast API Documentation</h1>
+            <p>Welcome to the RoadCast Weather API. This API provides weather forecasts and KNMI warnings for the Netherlands.</p>
+            
+            <h2>Endpoints</h2>
+            
+            <div class="endpoint">
+                <p><span class="method">GET</span> <code>/</code></p>
+                <p><strong>Description:</strong> Get weather forecast data for a specific day</p>
+                <div class="param">
+                    <strong>Query Parameters:</strong>
+                    <ul>
+                        <li><code>day</code> (optional, default: 0) - Day offset (0 = today, 1 = tomorrow, etc.)</li>
+                    </ul>
+                </div>
+                <p><strong>Example:</strong> <code>/?day=0</code></p>
+            </div>
+
+            <div class="endpoint">
+                <p><span class="method">GET</span> <code>/docs</code></p>
+                <p><strong>Description:</strong> This documentation page</p>
+            </div>
+            
+            <h2>Response Format</h2>
+            <p>All responses are returned in JSON format with the following structure:</p>
+            <pre><code>{
+  "min_temp": 5.2,
+  "max_temp": 12.8,
+  "rain": 2.5,
+  "showers": 0.3,
+  "snow": 0.0,
+  "sunrise": "2026-04-20T06:30:00",
+  "sunset": "2026-04-20T20:45:00",
+  "min_visibility": 8000,
+  "max_visibility": 24000,
+  "wind_speed": 25.5,
+  "wind_gusts": 40.2,
+  "warnings": []
+}</code></pre>
+            
+            <h2>Data Sources</h2>
+            <ul>
+                <li><strong>Weather Data:</strong> <a href="https://open-meteo.com" target="_blank">Open-Meteo API</a> (KNMI Seamless model)</li>
+                <li><strong>Weather Warnings:</strong> <a href="https://www.knmi.nl" target="_blank">KNMI Netherlands</a></li>
+            </ul>
+            
+            <h2>CORS Policy</h2>
+            <p>This API allows requests from the following origins:</p>
+            <ul>
+                <li>https://roadcast-sable.vercel.app</li>
+                <li>https://22082476.github.io</li>
+                <li>http://localhost:3000 (for development)</li>
+            </ul>
+            
+            <h2>Rate Limiting & Caching</h2>
+            <p>Weather data is cached for 120 seconds to reduce load on upstream APIs and improve response times.</p>
+        </div>
+        
+        <!-- Vercel Web Analytics -->
+        <script>
+            window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+        </script>
+        <script defer src="/_vercel/insights/script.js"></script>
+    </body>
+    </html>
+    """
+    return html_content
 
 
 @app.get("/")
